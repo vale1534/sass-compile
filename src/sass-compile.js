@@ -17,6 +17,12 @@ yargs
     describe: 'Path to look for imported files and assets',
     type: 'array',
   })
+  .option('replace', {
+    alias: 'r',
+    requiresArg: true,
+    describe:
+      'Replace from the start before path resolve\nSyntax: -replace pre/path;new/path',
+  })
   .option('output-style', {
     alias: 's',
     describe: 'CSS output style',
@@ -91,13 +97,34 @@ function main(argv) {
     [process.cwd()]
   );
 
+  let maps = [];
+  if (argv.replace) {
+    let { replace } = argv;
+    if (typeof replace === 'string') replace = [replace];
+    let hasError = false;
+
+    replace.forEach(r => {
+      if (hasError) return;
+      const kv = r.split(',');
+      if (kv.length === 1) maps[kv[0]] = '';
+      else if (kv.length !== 2) hasError = true;
+      else maps[kv[0]] = kv[1];
+    });
+
+    if (hasError) {
+      yargs.showHelp();
+      console.error('\nError argument: --replace');
+      return;
+    }
+  }
+
   const [infile, outfile] = args;
   const result = sass.renderSync({
     file: infile,
     includePaths: includePaths,
-    functions: inliners(),
-    importers: importers(),
-    outputStyle: argv.outputStyle || 'compact',
+    functions: inliners({}),
+    importer: importers({ maps }),
+    outputStyle: argv.outputStyle || 'nested',
     indentType: argv.indentType,
     indentWidth: argv.indentWidth,
     linefeed: argv.linefeed,

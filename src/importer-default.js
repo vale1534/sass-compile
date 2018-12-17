@@ -30,7 +30,7 @@ class DefaultImporter {
     ];
 
     let file = null;
-
+    
     // Special case: '~/' is home path
     if (url.startsWith('~/')) {
       targetUrls.forEach(url => {
@@ -53,11 +53,11 @@ class DefaultImporter {
 
     if (file) return retfile(file);
 
-    // Replace head words as required
+    // Map replacements as required
+    const { maps } = this.options;
     targetUrls = targetUrls.map(url => {
-      const { maps } = this.options;
       let resultUrl = url;
-      Object.keys(this.options.maps).forEach(key => {
+      Object.keys(maps).forEach(key => {
         if (url.startsWith(key)) {
           const len = key.length;
           resultUrl = maps[key] + url.substr(len);
