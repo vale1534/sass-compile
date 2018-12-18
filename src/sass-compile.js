@@ -23,6 +23,12 @@ yargs
     describe:
       'Replace from the start before path resolve\nSyntax: -replace pre/path;new/path',
   })
+  .option('inlines', {
+    alias: 'n',
+    requiresArg: true,
+    describe: 'Inliner as custom function names',
+    type: 'array',
+  })
   .option('output-style', {
     alias: 's',
     describe: 'CSS output style',
@@ -118,11 +124,12 @@ function main(argv) {
     }
   }
 
+  const { inlines } = argv;
   const [infile, outfile] = args;
   const result = sass.renderSync({
     file: infile,
     includePaths: includePaths,
-    functions: inliners({}),
+    functions: inliners({ inlines }),
     importer: importers({ maps }),
     outputStyle: argv.outputStyle || 'nested',
     indentType: argv.indentType,

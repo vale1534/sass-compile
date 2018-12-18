@@ -1,6 +1,6 @@
 {
-  "name": "sass-compile",
-  "version": "0.0.1",
+  "name": "@wenris/sass-compile",
+  "version": "0.0.3",
   "main": "lib/sass-compile.js",
   "repository": "https://github.com/wenris/sass-compile",
   "license": "MIT",

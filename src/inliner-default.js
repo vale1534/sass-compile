@@ -9,6 +9,7 @@ import optimizeSvgData from './optimizeSvgData';
 const REGEX = {
   lineBreaks: /[\r\n]+/g,
   spaces: /\s+/g,
+  xmlComment: /(<!--.*?-->)|(<!--[\w\W\n\s]+?-->)/g,
 };
 
 class DefaultInliner {
@@ -51,7 +52,10 @@ class DefaultInliner {
       uriData = uriData
         .toString('UTF-8')
         .replace(REGEX.lineBreaks, ' ')
-        .replace(REGEX.spaces, ' ');
+        .replace(REGEX.xmlComment, '')
+        .replace(REGEX.spaces, ' ')
+        .trim();
+
       uriData = optimizeSvgData(encodeURIComponent(uriData));
       return `url("data:image/svg+xml;${uriData}")`;
     }
@@ -65,7 +69,7 @@ class DefaultInliner {
     return function(url) {
       const urlValue = url.getValue();
       const result = self.inlinerInternal(this, urlValue);
-      return types.String(result);
+      return result ? types.String(result) : types.Null();
     };
   };
 }
